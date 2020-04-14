@@ -106,11 +106,11 @@ func Listen(port uint32) (*VsockListener, error) {
 
 var _ net.Listener = &VsockListener{}
 
-type Listener struct {
+type VsockListener struct {
 	*listener
 }
 
-func (self *Listener) Accept() (net.Conn, error) {
+func (self *VsockListener) Accept() (net.Conn, error) {
 	c, err := self.Accept()
 	if err != nil {
 		return nil, self.opError(opAccept, err)
@@ -119,10 +119,14 @@ func (self *Listener) Accept() (net.Conn, error) {
 	return c, nil
 }
 
-func (self *Listener) Addr() net.Addr                    { return self.Addr() }
-func (self *Listener) Close() error                      { return self.opError(opClose, self.Close()) }
-func (self *Listener) SetDeadline(t time.Time) error     { return self.opError(opSet, self.SetDeadline(t)) }
-func (self *Listener) opError(op errOp, err error) error { return opError(op, err, self.Addr(), nil) }
+func (self *VsockListener) Addr() net.Addr { return self.Addr() }
+func (self *VsockListener) Close() error   { return self.opError(opClose, self.Close()) }
+func (self *VsockListener) SetDeadline(t time.Time) error {
+	return self.opError(opSet, self.SetDeadline(t))
+}
+func (self *VsockListener) opError(op errOp, err error) error {
+	return opError(op, err, self.Addr(), nil)
+}
 
 func Dial(contextID, port uint32) (*Conn, error) {
 	c, err := dial(contextID, port)
