@@ -107,11 +107,11 @@ func Listen(port uint32) (*VsockListener, error) {
 var _ net.Listener = &VsockListener{}
 
 type VsockListener struct {
-	*listener
+	listener *listener
 }
 
 func (self *VsockListener) Accept() (net.Conn, error) {
-	c, err := self.Accept()
+	c, err := self.listener.Accept()
 	if err != nil {
 		return nil, self.opError(opAccept, err)
 	}
@@ -119,10 +119,13 @@ func (self *VsockListener) Accept() (net.Conn, error) {
 	return c, nil
 }
 
-func (self *VsockListener) Addr() net.Addr { return self.Addr() }
-func (self *VsockListener) Close() error   { return self.opError(opClose, self.Close()) }
+func (self *VsockListener) Addr() net.Addr {
+	return self.listener.Addr()
+}
+
+func (self *VsockListener) Close() error { return self.opError(opClose, self.listener.Close()) }
 func (self *VsockListener) SetDeadline(t time.Time) error {
-	return self.opError(opSet, self.SetDeadline(t))
+	return self.opError(opSet, self.listener.SetDeadline(t))
 }
 func (self *VsockListener) opError(op errOp, err error) error {
 	return opError(op, err, self.Addr(), nil)

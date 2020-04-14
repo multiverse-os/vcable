@@ -1,7 +1,6 @@
 package vsock
 
 import (
-	"fmt"
 	"net"
 	"time"
 
@@ -29,6 +28,7 @@ func (self *listener) Accept() (net.Conn, error) {
 	}
 
 	savm := sa.(*unix.SockaddrVM)
+
 	remote := &Addr{
 		ContextID: savm.CID,
 		Port:      savm.Port,
@@ -81,19 +81,16 @@ func listenLinux(lfd listenFD, cid, port uint32) (*VsockListener, error) {
 	}
 
 	lsavm := lsa.(*unix.SockaddrVM)
+
 	addr := &Addr{
 		ContextID: lsavm.CID,
 		Port:      lsavm.Port,
 	}
-	if addr != nil {
 
-		return &VsockListener{
-			&listener{
-				fd:   lfd,
-				addr: addr,
-			},
-		}, nil
-	} else {
-		return nil, fmt.Errorf("unable to determine address")
-	}
+	return &VsockListener{
+		&listener{
+			fd:   lfd,
+			addr: addr,
+		},
+	}, nil
 }
